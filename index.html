@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Escritório Personal Trainer</title>
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<header><h1>Personal Trainer</h1></header>
+
+<nav id="menuNav">
+  <button onclick="abrirAba('inicio')">🏠 Início</button>
+  <button onclick="abrirAba('login')">👤 Login</button>
+  <button onclick="abrirAba('alimentacao')">🍎 Alimentação</button>  
+  <button onclick="abrirAba('calculo')">📊 Cálculo</button>
+  <button onclick="abrirAba('respostas')">✅ Respostas</button>
+</nav>
+
+<section id="aba-inicio" class="aba ativa card">
+  <h2>Bem-vindo!</h2>
+  <p>Use o menu acima para entrar, selecionar seu cardápio, calcular seu IMC e receber recomendações personalizadas.</p>
+</section>
+
+<section id="aba-login" class="aba card">
+  <h2>Login do Aluno</h2>
+  <form id="formLogin">
+    <label>Nome:<br><input type="text" id="nome" required></label>
+    <label>Série:<br>
+      <select id="serie" required>
+        <option value="" disabled selected>Selecione sua Série</option>
+        <option value="6">6º</option>
+        <option value="7">7º</option>
+        <option value="8">8º</option>
+        <option value="9">9º</option>
+        <option value="1">1º Ensino Médio</option>
+        <option value="2">2º Ensino Médio</option>
+        <option value="3">3º Ensino Médio</option>
+        <option value="C">Ensino Médio Completo</option>
+        <option value="A">Série A (Acesso Criador)</option>
+      </select>
+    </label>
+    <label>Sexo:<br>
+      <select id="sexo" required>
+        <option value="" disabled selected>Selecione seu Sexo</option>
+        <option value="M">Masculino</option>
+        <option value="F">Feminino</option>
+        <option value="O">Outro</option>
+      </select>
+    </label>
+    <label>Email (Opcional para Alunos / Obrigatório para Criadores):<br><input type="email" id="email"></label>
+    <button type="submit">Próximo</button>
+  </form>
+</section>
+
+<section id="aba-alimentacao" class="aba card">
+  <h2>Monte seu Prato Ideal</h2>
+  <p>Selecione os alimentos que você mais consome normalmente ou deseja incluir na sua dieta.</p>
+
+  <form id="formSelecaoAlimentos">
+    <div id="cardapioInterativo"></div>
+
+    <div id="resumoSelecao">
+      <h3>Alimentos Selecionados:</h3>
+      <p id="listaSelecionados">Nenhum alimento selecionado.</p>
+    </div>
+
+    <button type="submit">Salvar Minha Seleção e Ir para Cálculo</button>
+  </form>
+</section>
+
+<section id="aba-calculo" class="aba card">
+  <h2>Calcular IMC e Meta</h2>
+  <form id="formCalculo">
+    <label>Peso atual (kg):<br><input type="number" id="peso" step="0.01" required></label>
+    <label>Altura (m):<br><input type="number" id="altura" step="0.001" required></label>
+
+    <label>Nível de atividade física:<br>
+      <select id="atividade" required>
+        <option value="" disabled selected>Selecione seu nível</option>
+        <option value="sedentario">Sedentário</option>
+        <option value="leve">Leve (1-2x/semana)</option>
+        <option value="moderado">Moderado (3-5x/semana)</option>
+        <option value="intenso">Intenso (diário)</option>
+      </select>
+    </label>
+
+    <label>Objetivo principal:<br>
+      <select id="objetivo" required>
+        <option value="" disabled selected>Selecione seu Objetivo</option>
+        <option value="massa">Ganhar massa muscular</option>
+        <option value="gordura">Perder gordura</option>
+        <option value="manter">Manter peso e saúde</option>
+        <option value="definir">Definir músculo</option>
+        <option value="emagrecer">Emagrecer</option>
+        <option value="ganhar_forca">Ganhar força</option>
+      </select>
+    </label>
+    <button type="submit">Calcular</button>
+  </form>
+</section>
+
+<section id="aba-respostas" class="aba card">
+  <h2>Resultados</h2>
+  <canvas id="graficoProgresso" style="max-width: 700px; margin: 20px auto;"></canvas>
+  <div id="respostas"></div>
+</section>
+
+<footer>
+  <p>Feira Escolar • Desenvolvido para demonstração educativa</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
