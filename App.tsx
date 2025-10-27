@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Chart from 'chart.js/auto';
 
 const cardapioCompleto = {
-  /* mesmo cardápio que você tem no JS original */
-  // Exemplo simples:
-  'Pães e Cereais (Carboidratos)': ['Pão Integral', 'Arroz Integral', 'Batata Doce'],
-  'Proteínas': ['Peito de Frango', 'Ovo', 'Peixe'],
-  'Verduras': ['Alface', 'Tomate', 'Cenoura']
+  'Pães e Cereais': ['Pão Integral', 'Arroz Integral', 'Batata Doce'],
+  'Proteínas': ['Frango', 'Peixe', 'Ovo'],
+  'Vegetais': ['Alface', 'Tomate', 'Cenoura']
 };
 
 type Usuario = {
@@ -24,9 +22,10 @@ type Usuario = {
 
 const App: React.FC = () => {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
-  const [pagina, setPagina] = useState<'login' | 'cardapio' | 'calculo' | 'resultados'>('login');
+  const [pagina, setPagina] = useState<'login' | 'cardapio' | 'calculo' | 'resultados' | 'criador'>('login');
   const [selecao, setSelecao] = useState<string[]>([]);
   const [resultado, setResultado] = useState<any>(null);
+  const [historico, setHistorico] = useState<Usuario[]>([]);
 
   useEffect(() => {
     if (resultado) {
@@ -56,6 +55,24 @@ const App: React.FC = () => {
     }
   }, [resultado]);
 
+  // Funções para chamadas API backend (exemplo)
+  async function carregarHistorico() {
+    const res = await fetch('http://localhost:4000/historico');
+    const dados = await res.json();
+    setHistorico(dados);
+  }
+  async function limparHistorico() {
+    await fetch('http://localhost:4000/clear', { method: 'POST' });
+    carregarHistorico();
+  }
+  async function salvarDados(usuario: Usuario) {
+    await fetch('http://localhost:4000/salvar-dados', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(usuario)
+    });
+  }
+
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
@@ -69,14 +86,16 @@ const App: React.FC = () => {
       return;
     }
 
-    setUsuario({ nome, serie, sexo, email, selecaoAlimentos: [] });
+    const novoUsuario: Usuario = { nome, serie, sexo, email, selecaoAlimentos: [] };
+    setUsuario(novoUsuario);
     setPagina('cardapio');
   };
 
   const handleSelecaoSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!usuario) return;
-    setUsuario({ ...usuario, selecaoAlimentos: selecao });
+    const novoUsuario = { ...usuario, selecaoAlimentos: selecao };
+    setUsuario(novoUsuario);
     setPagina('calculo');
   };
 
@@ -99,9 +118,19 @@ const App: React.FC = () => {
     else if (imc < 30) status = 'Sobrepeso';
     else status = 'Obesidade';
 
-    setResultado({ peso, altura, imc, status, objetivo });
+    const novoResultado = { peso, altura, imc, status, objetivo };
+    setResultado(novoResultado);
+
+    const novoUsuario = { ...usuario, peso, altura, imc, status, objetivo };
+    salvarDados(novoUsuario);
+    setUsuario(novoUsuario);
+
     setPagina('resultados');
   };
+
+  useEffect(() => {
+    if (pagina === 'criador') carregarHistorico();
+  }, [pagina]);
 
   return (
     <div style={{ color: '#eeeeee', backgroundColor: '#1a1a1a', minHeight: '100vh', padding: 20 }}>
@@ -112,6 +141,7 @@ const App: React.FC = () => {
         <button onClick={() => usuario && setPagina('cardapio')}>Cardápio</button>
         <button onClick={() => usuario && setPagina('calculo')}>Calcular IMC</button>
         <button onClick={() => resultado && setPagina('resultados')}>Resultados</button>
+        <button onClick={() => setPagina('criador')}>Painel do Criador</button>
       </nav>
 
       {pagina === 'login' && (
@@ -187,6 +217,21 @@ const App: React.FC = () => {
           <p>Status: {resultado.status}</p>
           <p>Objetivo: {resultado.objetivo}</p>
           <canvas id="graficoProgresso" width="600" height="400"></canvas>
+        </div>
+      )}
+
+      {pagina === 'criador' && (
+        <div>
+          <h2>Painel do Criador</h2>
+          <button onClick={limparHistorico}>Limpar Histórico</button>
+          <ul>
+            {historico.length === 0 && <li>Nenhum aluno registrado ainda.</li>}
+            {historico.map((aluno, idx) => (
+              <li key={idx}>
+                <strong>{aluno.nome}</strong> - {aluno.email || 'Sem email'} - IMC: {aluno.imc?.toFixed(2) || 'N/A'}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
